@@ -1,8 +1,7 @@
 require('dotenv').config();
 
 const express = require("express");
-const crypto = require("crypto");
-const nodemailer = require("nodemailer");
+
 
 const path = require("path");
 const bcrypt = require("bcrypt");
@@ -31,17 +30,9 @@ app.get("/events", (req, res) => {
   res.sendFile(path.join(__dirname, "", "events.html"));
 });
 
-app.get("/forgot-password", (req, res) => {
-  res.sendFile(path.join(__dirname, "", "forgot-password.html"));
-});
 
-app.get("/reset-password", (req, res) => {
-  const { token } = req.query;
-  if (!token) {
-    return res.status(400).send("Invalid reset link.");
-  }
-  res.sendFile(path.join(__dirname, "", "reset-password.html"));
-});
+
+
 
 // Signup route
 app.post("/signup", async (req, res) => {
@@ -104,85 +95,9 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Forgot password route
-app.post("/forgot-password", async (req, res) => {
-  const { email } = req.body;
 
-  try {
-    const [rows] = await db.promise().query("SELECT * FROM users WHERE email = ?", [email]);
-    if (rows.length === 0) {
-      return res.send("If an account with that email exists, a reset link has been sent.");
-    }
 
-    const user = rows[0];
-    const token = crypto.randomBytes(32).toString("hex");
-    const expiresAt = new Date(Date.now() + 3600000); // 1 hour
 
-    // Store token in database
-    await db.promise().query(
-      "INSERT INTO password_resets (user_id, email, token, expires_at) VALUES (?, ?, ?, ?)",
-      [user.id, email, token, expiresAt]
-    );
-
-    // Send email
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    const resetLink = `http://localhost:${process.env.PORT || 5000}/reset-password?token=${token}`;
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Password Reset - AquaUTM",
-      html: `<p>Click <a href="${resetLink}">here</a> to reset your password. This link expires in 1 hour.</p>`,
-    };
-
-    await transporter.sendMail(mailOptions);
-    console.log(`✅ Password reset email sent to: ${email}`);
-    res.send("If an account with that email exists, a reset link has been sent.");
-  } catch (err) {
-    console.error("Forgot password error:", err);
-    res.status(500).send("Error sending reset email.");
-  }
-});
-
-// Reset password route
-app.post("/reset-password", async (req, res) => {
-  const { token, password, confirmPassword } = req.body;
-
-  if (password !== confirmPassword) {
-    return res.send("Passwords do not match.");
-  }
-
-  try {
-    const [rows] = await db.promise().query(
-      "SELECT * FROM password_resets WHERE token = ? AND expires_at > NOW()",
-      [token]
-    );
-    if (rows.length === 0) {
-      return res.send("Invalid or expired reset token.");
-    }
-
-    const reset = rows[0];
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Update password
-    await db.promise().query("UPDATE users SET password = ? WHERE id = ?", [hashedPassword, reset.user_id]);
-
-    // Delete used token
-    await db.promise().query("DELETE FROM password_resets WHERE token = ?", [token]);
-
-    console.log(`✅ Password reset for user ID: ${reset.user_id}`);
-    res.send("Password reset successfully. You can now log in with your new password.");
-  } catch (err) {
-    console.error("Reset password error:", err);
-    res.status(500).send("Error resetting password.");
-  }
-});
 
 // Start server
 const port = process.env.PORT || 5000;

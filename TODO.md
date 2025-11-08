@@ -1,11 +1,10 @@
-# TODO: Implement Forgot Password Feature
+# TODO: Remove Forgot Password Functionality
 
-- [x] Add "Forgot Password?" link to login.html below the login form.
-- [x] Create forgot-password.html: page with form to enter email.
-- [x] Create reset-password.html: page with form to enter new password (accessed via token link).
-- [x] Update aquautm.sql: add password_resets table to store reset tokens.
-- [x] Update package.json: add nodemailer dependency.
-- [x] Update app.js: add routes for forgot password flow (GET/POST /forgot-password, GET/POST /reset-password) and email sending logic.
-- [x] Install nodemailer via npm.
-- [x] Set up SMTP email configuration in .env (e.g., Gmail or other provider).
-- [x] Test the forgot password flow end-to-end.
+- [x] Delete forgot-password.html file
+- [x] Delete reset-password.html file
+- [x] Remove forgot password link from login.html
+- [x] Remove GET/POST /forgot-password routes from app.js
+- [x] Remove GET/POST /reset-password routes from app.js
+- [x] Remove nodemailer dependency from package.json
+- [x] Update TODO.md to remove completed forgot/reset password tasks
+- [x] Test the application to ensure login still works
