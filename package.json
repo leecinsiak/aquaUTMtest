@@ -1,0 +1,28 @@
+{
+  "name": "aquautm",
+  "version": "1.0.0",
+  "description": "AquaUTM Swimming Pool Management System",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "body-parser": "^2.2.0",
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2",
+    "mysql2": "^3.6.0",
+    "nodemailer": "^6.10.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "swimming",
+    "pool",
+    "utm"
+  ],
+  "author": "Sora",
+  "license": "MIT"
+}
